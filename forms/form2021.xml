@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid Technologies Online Tools 1.0 (https://www.liquid-technologies.com) -->
+<KVDPH_2021 xmlns="https://ekr.financnasprava.sk/Formulare/XSD/kv_dph_2021.xsd" xsi:schemaLocation="https://ekr.financnasprava.sk/Formulare/XSD/kv_dph_2021.xsd schema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Identifikacia>
+    <IcDphPlatitela>SK5893719523</IcDphPlatitela>
+    <Druh>D</Druh>
+    <Obdobie>
+      <Rok>9315</Rok>
+      <Stvrtrok>3</Stvrtrok>
+    </Obdobie>
+    <Nazov>string</Nazov>
+    <Stat>string</Stat>
+    <Obec>string</Obec>
+    <PSC>string</PSC>
+    <Ulica>string</Ulica>
+    <Cislo>string</Cislo>
+    <Tel>string</Tel>
+    <Email>string</Email>
+  </Identifikacia>
+  <Transakcie>
+    <A1 F="q1" Den="1990-10-08" Z="-1031589.77" D="4121890.23" S="20" KOpr="1" />
+    <A2 Odb="SK4306085191" F="+)`" Den="2004-01-17" Z="-4971609.77" TK="9050" />
+    <A2 Odb="SK6958796062" F="i" Den="2001-08-12" Z="3633420.23" TD="MT" MJ="kg" />
+    <A2 Odb="SK6468774543" F="c" Den="1995-04-09" Z="-3150989.77" TK="9705" MJ="ks" />
+    <B1 F="v" Den="1971-06-10" Z="4706620.23" D="-48619.77" S="10" O="-4378949.77" />
+    <B1 Dod="string" F="H" Den="1988-10-04" Z="4749370.23" D="-1288319.77" S="20" O="-843529.77" KOpr="1" />
+    <B1 F=",a3" Den="1988-03-05" Z="-1623579.77" D="1751670.23" S="10" O="-2111449.77" />
+    <B2 Dod="SK5793895274" F="1" Den="1971-02-04" Z="1860810.23" D="3111070.23" S="10" O="2149500.23" KOpr="1" />
+    <B31 Z="3589810.23" D="1155100.23" O="2378480.23" KOpr="1" />
+    <B32 Dod="SK3406415202" Z="-4552489.77" D="4143410.23" O="992520.23" />
+    <B32 Dod="SK7949370968" Z="-4278129.77" D="-2025389.77" O="4383280.23" />
+    <C1 FO="#O" FP="Ve" ZR="-2989029.77" TK="7240" TD="IO" MJ="t" />
+    <C2 FO="W" FP="@&lt;" ZR="-3685099.77" DR="1362480.23" S="10" OR="331170.23" ONP="x" />
+    <C2 Dod="OT9c" FO=".L" FP="W?" ZR="4607040.23" DR="84850.23" S="20" OR="-3398849.77" KOpr="1" />
+    <C2 Dod="SK6612912414" FO="&amp;" FP="2" ZR="-4378489.77" DR="-1202729.77" S="20" OR="-1513749.77" ONP="x" />
+    <C2 FO="~h)5u" FP="m#" ZR="4440080.23" S="10" OR="2017450.23" KOpr="2" />
+    <C2 Dod="SK7884424991" FO="bd" FP="lM" S="20" OR="4188820.23" KOpr="2" />
+    <D1 SumaObratov="-2549499.77" Z="-3015919.77" D="390540.23" ZZn="-2122349.77" DZn="4442200.23" KOpr="1" />
+    <D1 SumaObratov="-1063389.77" Z="-672329.77" D="705850.23" ZZn="-1385499.77" DZn="-3470259.77" />
+    <D2 Z="1304420.23" D="-3295979.77" ZZn="-1740089.77" DZn="945010.23" KOpr="1" />
+    <D2 Z="4295520.23" D="4106910.23" ZZn="2710160.23" DZn="2456620.23" />
+  </Transakcie>
+</KVDPH_2021>
