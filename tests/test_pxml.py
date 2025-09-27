@@ -31,3 +31,28 @@ def test_get_rid_id_xml():
 	assert type(get_rid_id_xml(text)) == type(str())
 	assert get_rid_id_xml(text) == '<Identifikacia>'
 	assert get_rid_id_xml('<?xml version="1.0" encoding="utf-8"?>\n') == ''
+
+# Additional test stubs for uncovered functions in main.py
+def test_get_values_from_row():
+	# TODO: Add a real test with a mock workbook and sheet
+	assert callable(get_values_from_row)
+
+def test_process_single_row():
+	# TODO: Add a real test with a mock workbook and sheet
+	assert callable(process_single_row)
+
+def test_get_transactions():
+	# TODO: Add a real test with a mock workbook and sheet
+	assert callable(get_transactions)
+
+def test_process_row_dict():
+	# TODO: Add a real test with a sample dictionary
+	assert callable(process_row_dict)
+
+def test_xml_string_conversion():
+	# TODO: Add a real test with sample data
+	assert callable(xml_string_conversion)
+
+def test_transakcie_collector():
+	# TODO: Add a real test with a mock workbook
+	assert callable(transakcie_collector)

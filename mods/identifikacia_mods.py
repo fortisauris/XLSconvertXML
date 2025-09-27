@@ -1,38 +1,43 @@
 
 def identifikacia_mods(xml_raw: str): # TU SA MODIFIKUJE CAST IDENTIFIKACIA
 	'''
-	Function takes raw XML converted as string and makes multiple mods according to wanted OUTPUT.
-	First we need to split XML string. Then we make tag <obdobie> accoding to data contained in XLS.
-	Then we reassemble XML string back
-	param1::: xml_raw - xml string before modification
-	return::: id_reassembled back without last \n\t
-
+	Modifies the <Obdobie> section in the given XML string according to the data (month or quarter) found in the input.
+	Args:
+		xml_raw (str): The raw XML string before modification.
+	Returns:
+		str: The modified XML string with the correct <Obdobie> tag structure.
 	'''
+	# Split the XML string into lines for easier manipulation
+	xml_lines = xml_raw.split('\n\t')
 
-	raw_id_list = xml_raw.split('\n\t')
-	# raw_id_list = raw_id_list[0:]
-	
-	
-	# MOD <obdobie>
-	if raw_id_list[3][:8]=='<Mesiac>':  # Ak je uvedeny mesiac treba do obdobia 3 polozky
+	# Check for <Mesiac> (month) or <Stvrtrok> (quarter) and build <Obdobie> accordingly
+	if len(xml_lines) > 5 and xml_lines[3][:8] == '<Mesiac>':
 		print("NASIEL SOM MESIAC")
-		Obdobie_string = "<Obdobie>\n\t\t"+raw_id_list[3]+"\n\t\t"+raw_id_list[4]+"\n\t\t"+raw_id_list[5]+"\n\t</Obdobie>"
-		raw_id_list.insert(3,Obdobie_string)  # vlozi obdobie
-		raw_id_list.pop(4)
-		raw_id_list.pop(5)
-		for i in raw_id_list:
-			if i[:10] == '<Stvrtrok>':
-				raw_id_list.remove(i)
+		# Build <Obdobie> tag for month
+		obdobie_tag = (
+			"<Obdobie>\n\t\t" + xml_lines[3] + "\n\t\t" + xml_lines[4] + "\n\t\t" + xml_lines[5] + "\n\t</Obdobie>"
+		)
+		xml_lines.insert(3, obdobie_tag)
+		# Remove the now redundant tags
+		xml_lines.pop(4)
+		xml_lines.pop(5)
+		# Remove any <Stvrtrok> tags if present
+		xml_lines = [line for line in xml_lines if not line.startswith('<Stvrtrok>')]
 
-	if raw_id_list[3][:10] =='<Stvrtrok>':
+	elif len(xml_lines) > 4 and xml_lines[3][:10] == '<Stvrtrok>':
 		print("NASIEL SOM STVRTROK")
-		Obdobie_string = "<Obdobie>\n\t\t"+raw_id_list[3]+"\n\t\t"+raw_id_list[4]+"\n\t</Obdobie>"
-		raw_id_list.insert(3,Obdobie_string)  # vlozi obdobie
-		raw_id_list.pop(4)
-		raw_id_list.pop(5)
+		# Build <Obdobie> tag for quarter
+		obdobie_tag = (
+			"<Obdobie>\n\t\t" + xml_lines[3] + "\n\t\t" + xml_lines[4] + "\n\t</Obdobie>"
+		)
+		xml_lines.insert(3, obdobie_tag)
+		# Remove the now redundant tags
+		xml_lines.pop(4)
+		xml_lines.pop(5)
 
-	# REASSEMBLE XML STRING BACK STRING
-	id_reassembled = str()
-	for i in raw_id_list:
-		id_reassembled += i + '\n\t'
+	# Reassemble the XML string
+	id_reassembled = ''
+	for line in xml_lines:
+		id_reassembled += line + '\n\t'
+	# Remove the last '\n\t' for clean output
 	return id_reassembled[:-2]

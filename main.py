@@ -9,122 +9,126 @@ from mods.identifikacia_mods import identifikacia_mods
 
 def multiple_rows(wb, sh):
 	'''
-	Function to process multiple rows of data within one sheet.
-	param1::: wb - workbook openpyxl. object
-	param2::: sh - sheet
-	return::: list of rows with data in dictionaries
+	Processes multiple rows of data within a given sheet.
+	Args:
+		wb: The workbook object (openpyxl or xlrd).
+		sh: The sheet object to process.
+	Returns:
+		list: A list of dictionaries, each representing a row of data.
 	'''
 	multiple = list()
 	for row in range(1, sh.nrows):
-		# print('DATA_ROW : ', row, sh[row])
-		row_value = get_values_from_row(wb,sh, row)
+		# For each row (except header), extract values as a dictionary
+		row_value = get_values_from_row(wb, sh, row)
 		multiple.append(row_value)
 	return multiple
 
 
 def process_single_row(wb, sh):
 	'''
-	Function to process multiple rows of data within one sheet.
-	param1::: wb - workbook openpyxl. object
-	param2::: sh - sheet
-	return::: data in dictoionary
-
+	Processes a single row of data from a given sheet.
+	Args:
+		wb: The workbook object (openpyxl or xlrd).
+		sh: The sheet object to process.
+	Returns:
+		dict: A dictionary representing the row of data.
 	'''
-	# print('DATA_ROW : ', 1, sh[0])
-	row_value = get_values_from_row(wb,sh, 0)
-	# print(row_value)
+	# Extract the first row as a dictionary
+	row_value = get_values_from_row(wb, sh, 0)
 	return row_value
 
 
 def get_values_from_row(wb, sh, row):
 	'''
-	Function extracts data from given row from given sheet. Automatically reads COLUMNS and makes them to keys in result 
-	Dictionary b1
-	param1::: wb - workbook from XLS file
-	param2::: sh - sheet to extract data from
-	param3::: row - specific row containig data
-	return::: b1 - dict prepared to XML conversion
+	Extracts data from a specific row in a given sheet.
+	Automatically reads columns and uses them as keys in the result dictionary.
+	Args:
+		wb: The workbook object.
+		sh: The sheet object to extract data from.
+		row: The row index to extract.
+	Returns:
+		dict: Dictionary prepared for XML conversion.
 	'''
 	b1 = dict()
 	for rx in range(sh.ncols):
-		# print("COLUMN : ", rx)
-		# print(rx, type(sh.col(rx)[row]), dir(sh.col(rx)[row]))
-		# print(sh.col(rx)[row].ctype)  # zistujeme co sa v bunke nachadza
-			
-
-    	# Automaticka konverzia z xlsdate do datumu
-
-		if sh.col(rx)[row].ctype == 3:  # tento kod 3 znamena ze ide o xldate
-			#print('POZOR KONVERZIA DATUMU')
+		# For each column in the row
+		# If the cell is a date, convert it to ISO format
+		if sh.col(rx)[row].ctype == 3:  # 3 means xldate
 			excel_date = sh.col(rx)[1].value
-			#print(excel_date)
 			python_date = datetime.datetime(*xlrd.xldate_as_tuple(excel_date, 0))
-			#print(python_date)
 			iso_date = python_date.strftime('%Y-%m-%d')
 			b1[sh.col(rx)[0].value] = iso_date
 		else:
-			# TU SA ODSTRANUJE NS1:
+			# Remove 'ns1:' prefix from key if present
 			key_name = sh.col(rx)[0].value
 			if key_name[0:4] == 'ns1:':
-				key_name = key_name[4:]  # ODSTRANUJE ns1:
-
-		b1[key_name] = sh.col(rx)[row].value  # TU ZAPISUJE HODNOTY
-			# b1[sh.col(rx)[0].value] = sh.col(rx)[row].value
-	# print('ROW DICT :', b1)
+				key_name = key_name[4:]
+			b1[key_name] = sh.col(rx)[row].value  # Store value in dictionary
 	return b1
 
 
 def get_transactions(wb, sheet):
-	# NAHRAVAM DATA DO SLOVNIKA B1  - VSETKY RIADKY
+	'''
+	Collects all data from a given sheet and returns as a list of dictionaries.
+	Args:
+		wb: The workbook object.
+		sheet: The sheet index to process.
+	Returns:
+		list: List of dictionaries for each row.
+	'''
 	b1total = list()
 	sh = wb.sheet_by_index(sheet)
-	# print("MENO TABULKY: {0} \tPOCET RIADKOV: {1} \tPOCET STLPCOV: {2}".format(sh.name, sh.nrows, sh.ncols))
-	# print("Cell D30 is {0}".format(sh.cell_value(rowx=29, colx=3)))
-	b1 = dict()
-
-	if sh.nrows > 1:  # detekcia viacerich riadkov v tabulke
-		# print('MULTIPLE ROWS DETECTED', sh.nrows)
+	# If more than one row, process as multiple rows
+	if sh.nrows > 1:
 		multiple_list = multiple_rows(wb, sh)
-
+		# Optionally process each row dictionary
 		for rows in multiple_list:
-			#process_row_dict(rows)
 			pass
-
 		b1total.append(multiple_list)
-	else:  # IN CASE ONLY ONE ROW IN SHEET
+	else:
+		# Only one row in sheet
 		print('SINGLE ROW DETECTED', sh.nrows)
 		single_row = process_single_row(wb, sh)
-		# process_row_dict(single_row)
 		b1total.append(single_row)
-	# print(b1total)
 	return b1total
 
 
 def process_row_dict(row_dict):  # vypise postupne vsetky hodnoty a ich kluce pre kontrolu
+	'''
+	Prints all keys and values in a row dictionary for inspection.
+	Args:
+		row_dict: Dictionary representing a row.
+	'''
 	b1 = row_dict
 	for key in b1.keys():
+		# Print key-value pairs for debugging
 		print("KLUC: {0} \tHODNOTA:  {1}".format(key, b1[key]))
 	
 def xml_string_conversion(name, part):
-	# print("NAME :", name, "\tPART : ", part, "DLZKA ZAZNAMU", len(part[0]))
+	'''
+	Converts a list of dictionaries to XML string using xmltodict.
+	Args:
+		name: The XML tag name for the part.
+		part: List of dictionaries to convert.
+	Returns:
+		str: XML string output.
+	'''
 	for i in part:
-		part = {name:i}
+		# Convert each dictionary to XML under the given tag name
+		part = {name: i}
 		part_output = xmltodict.unparse(part, pretty=True)
 		print(part_output)
-	# TU SA SPRAVIA POSLEDNE UPRAVY
-	#final_id = identifikacia_mods(identifikacia_output)
-	# print(final_id)
 	return part_output
 
 
 def transakcie_collector(wb, wb_length):
 	'''
-	Function takes extracts all data from XLS sheets from sheet 1 to sheet x as dictionaries. But Output need to be saved
-	not as tags. Data should be saved as XML arguments in tag nambed by SHEET. So there must be mechanism to convert tags into XML
-	arguments with every single key in dictionary should be decorated with @. This changes tags in conversion to args.
-	param1::: wb - workbook to convert
-	param2::: wb_length - how many sheets should be converted to XML
-	return::: 
+	Extracts all data from XLS sheets (from sheet 1 to wb_length) as dictionaries and saves as XML arguments.
+	Args:
+		wb: The workbook to convert.
+		wb_length: Number of sheets to convert to XML.
+	Returns:
+		None
 	'''
 	names = iter(wb.sheet_names())
 	SAVE.save_xml('\n<Transakcie>\n')
@@ -165,9 +169,11 @@ MODIFIKACIE DAT
 
 def make_argument(raw_dict: dict):  # TU SA MENI DATOVA CAST NA XML ARGUMENT  PRIDAJ @ pred kazdy clen
 	'''
-	Funkcia este pred konverziou na XML prida na vsetky kluce vnutri dictionary @ aby z nich vytvorila XML argumenty
-	param1::: raw_dict dict
-	return::: prepared_dict kazdy kluc @
+	Adds '@' to all keys in a dictionary to prepare for XML argument conversion.
+	Args:
+		raw_dict (dict): The dictionary to process.
+	Returns:
+		dict: Dictionary with '@' prefixed keys.
 	'''
 	prepared_dict = dict()
 	for key in raw_dict.keys():
@@ -183,9 +189,11 @@ TRANSAKCIE MODS
 '''
 def prepare_final_string(xml_string: str):
 	'''
-	Function takes Transactions data and removes all <?xml?> tags to write output file
-	param1::: xml_string - raw string to teardown and modify
-	return::: clean xml string to write output
+	Removes all <?xml?> tags from the XML string for output file writing.
+	Args:
+		xml_string (str): Raw XML string to modify.
+	Returns:
+		str: Cleaned XML string for output.
 	'''
 	teardown1 = xml_string.split('><')
 	# print('TEARDOWN 1: ',teardown1)
@@ -196,11 +204,11 @@ def prepare_final_string(xml_string: str):
 
 def get_rid_id_xml(xml_string):
 	'''
-	Output file is assembled with multiple conversions from multiple dictionaries. Everytime converted string starts with
-	<?xml version="1.0" encoding="utf-8"?>. We do need to get rid of them. In this function we are using another methods. 
-	Instead of split XML to tags and manipulate them we use SLICING to get rid of unwanted string.
-	param1::: xml_string - id xml with <?xml version="1.0" encoding="utf-8"?> at start
-	return::: xml_string - id xml without <?xml version="1.0" encoding="utf-8"?>
+	Removes the <?xml version="1.0" encoding="utf-8"?> tag from the start of the XML string.
+	Args:
+		xml_string (str): XML string with the unwanted tag.
+	Returns:
+		str: XML string without the unwanted tag.
 	'''
 	unwanted = '<?xml version="1.0" encoding="utf-8"?>\n'
 	piece = len(unwanted)
@@ -214,37 +222,47 @@ def get_rid_id_xml(xml_string):
 
 #   M A I N   P R O G R A M M
 if __name__ == '__main__':
-	if len(sys.argv) == 1:  # ak si ho nepomenujeme inak tak 
-		wb = xlrd.open_workbook(filename='KV_test_2023 xml.xls')  # otvara subor XLS
-
-	else:
-		if SaveTools.non_existing_file(sys.argv[1]) is True:
-			print("FILE NOT FOUND 404")
-			quit()
+	try:
+		if len(sys.argv) == 1:
+			filename = 'KV_test_2023 xml.xls'
 		else:
-			wb = xlrd.open_workbook(filename=sys.argv[1])  # otvara subor XLS
+			filename = sys.argv[1]
+		if SaveTools.non_existing_file(filename):
+			print(f"FILE NOT FOUND: {filename}")
+			sys.exit(1)
+		try:
+			wb = xlrd.open_workbook(filename=filename)
+		except Exception as e:
+			print(f"Error opening workbook: {e}")
+			sys.exit(1)
 
-	SAVE = SaveTools('output.xml')
-	SAVE.erase_file()
-	SAVE.save_xml('<?xml version="1.0" encoding="utf-8"?>\n')
-	SAVE.save_xml('<KVDPH_2023 xmlns="https://ekr.financnasprava.sk/Formulare/XSD/kv_dph_2023.xsd" xsi:schemaLocation="https://ekr.financnasprava.sk/Formulare/XSD/kv_dph_2023.xsd schema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n')
-	
-	# NATAHUJEME IDENTIFIKACIU SUBJEKTU Z XLS
-	print("IDENTIFIKACIA")
-	id_part = get_transactions(wb,0)
-	# print(id_part)
-	# HNED TO UKLADAJ AKO XML LEBO INAK SA TO POSERIE
-	xml_raw = xml_string_conversion("Identifikacia", id_part)
-	# print(xml_raw)
-	xml_pure = identifikacia_mods(xml_raw)
-	# print('IDENTIFIKACIA PURE STRING :',xml_pure)
-	xml_pure = get_rid_id_xml(xml_pure)
-	# print('IDENTIFIKACIA PURE STRING :',xml_pure)
-	# TODO GET RID OFF <?xml?> before Identification
-	SAVE.save_xml(lines=xml_pure)
+		SAVE = SaveTools('output.xml')
+		try:
+			SAVE.erase_file()
+			SAVE.save_xml('<?xml version="1.0" encoding="utf-8"?>\n')
+			SAVE.save_xml('<KVDPH_2023 xmlns="https://ekr.financnasprava.sk/Formulare/XSD/kv_dph_2023.xsd" xsi:schemaLocation="https://ekr.financnasprava.sk/Formulare/XSD/kv_dph_2023.xsd schema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n')
+		except Exception as e:
+			print(f"Error initializing output file: {e}")
+			sys.exit(1)
 
+		print("IDENTIFIKACIA")
+		try:
+			id_part = get_transactions(wb, 0)
+			xml_raw = xml_string_conversion("Identifikacia", id_part)
+			xml_pure = identifikacia_mods(xml_raw)
+			xml_pure = get_rid_id_xml(xml_pure)
+			SAVE.save_xml(lines=xml_pure)
+		except Exception as e:
+			print(f"Error processing identification: {e}")
+			sys.exit(1)
 
-	# TRANSAKCIE COLLECTOR
-	transakcie_collector(wb, 8)  # TODO Get number of sheets
+		try:
+			transakcie_collector(wb, 8)  # TODO Get number of sheets
+		except Exception as e:
+			print(f"Error processing transactions: {e}")
+			sys.exit(1)
 
-	print("XML BOLO VYGENEROVANE")
+		print("XML BOLO VYGENEROVANE")
+	except Exception as e:
+		print(f"Unexpected error: {e}")
+		sys.exit(1)

@@ -9,7 +9,7 @@ formáte. Bohužiaľ SAP exportuje iba XLS v binárnom formáte. Preto je potreb
 ## Inštalácia
 
 Program sa inštaluje v dvoch fázach:
-1. Je potrebné mať nainštalovaný Python 3.11 z Microsoft Store:
+1. Je potrebné mať nainštalovaný Python 3.11 z Microsoft Store alebo novsi:
 	https://www.microsoft.com/store/productId/9NRWMJP3717K
 
 2. je potrebné stiahnuť repozitár z githubu
